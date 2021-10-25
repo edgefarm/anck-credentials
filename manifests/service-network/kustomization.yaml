@@ -8,7 +8,7 @@ resources:
   - ./base
 
 configMapGenerator:
-- name: service-nats-config
+- name: nats-config
   behavior: replace
   files:
   - ./config/nats.conf

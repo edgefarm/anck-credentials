@@ -7,7 +7,7 @@ helmCharts:
   namespace: default
   version: v0.9.0
   repo: https://nats-io.github.io/k8s/helm/charts/
-  releaseName: service
+  releaseName: "nats"
   valuesInline:
     nats:
       jetstream:
@@ -26,7 +26,7 @@ helmCharts:
     leafnodes:
       enabled: true
       remotes:
-        - url: "tls://global-nats.network-global.cluster.local"
+        - url: "tls://nats.network-global.cluster.local"
     natsbox:
       enabled: false
 
