@@ -32,7 +32,7 @@ commands:
     devspace run sealed-secrets.init
 
 profiles:
-- name: example
+- name: user
   merge:
     deployments:
     - name: nats-sub1
@@ -40,12 +40,12 @@ profiles:
         kustomize: true
         kustomizeArgs: ["--enable-helm"]
         manifests:
-        - ./dev/manifests/nats-sub1
-      namespace: example-nats-sub-1
+        - ./dev/manifests/user/nats-sub1
+      namespace: user-nats-sub-1
     - name: nats-sub2
       kubectl:
         kustomize: true
         kustomizeArgs: ["--enable-helm"]
         manifests:
-        - ./dev/manifests/nats-sub2
-      namespace: example-nats-sub-2
+        - ./dev/manifests/user/nats-sub2
+      namespace: user-nats-sub-2
