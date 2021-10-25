@@ -14,6 +14,25 @@ dependencies:
     subPath: /sealed-secrets
     branch: rework
 
+commands:
+- name: init
+  command: |-
+    devspace run update
+    devspace run k3d.init
+    devspace run sealed-secrets.init
+
+- name: purge
+  command: |-
+    devspace run k3d.purge
+
+- name: activate
+  command: |-
+    devspace run k3d.activate
+
+- name: update
+  command: |-
+    devspace update dependencies
+
 deployments:
 
 - name: nats-main
@@ -23,13 +42,6 @@ deployments:
     manifests:
     - ./dev/manifests/nats-main
   namespace: edgefarm-network
-
-commands:
-
-- name: init
-  command: |-
-    devspace run k3d.init
-    devspace run sealed-secrets.init
 
 profiles:
 - name: user
