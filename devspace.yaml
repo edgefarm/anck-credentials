@@ -1,0 +1,51 @@
+version: v1beta11
+
+dependencies:
+
+- name: k3d
+  source:
+    git: https://github.com/edgefarm/devspace.base
+    subPath: /k3d
+    branch: rework
+
+- name: sealed-secrets
+  source:
+    git: https://github.com/edgefarm/devspace.base
+    subPath: /sealed-secrets
+    branch: rework
+
+deployments:
+
+- name: nats-main
+  kubectl:
+    kustomize: true
+    kustomizeArgs: ["--enable-helm"]
+    manifests:
+    - ./example/nats-main
+  namespace: edgefarm-network
+
+commands:
+
+- name: init
+  command: |-
+    devspace run k3d.init
+    devspace run sealed-secrets.init
+
+profiles:
+- name: example
+  merge:
+    deployments:
+    - name: nats-sub1
+      kubectl:
+        kustomize: true
+        kustomizeArgs: ["--enable-helm"]
+        manifests:
+        - ./example/nats-sub1
+      namespace: example-nats-sub-1
+    - name: nats-sub2
+      kubectl:
+        kustomize: true
+        kustomizeArgs: ["--enable-helm"]
+        manifests:
+        - ./example/nats-sub2
+      namespace: example-nats-sub-2

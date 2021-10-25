@@ -6,7 +6,7 @@ resources:
   - ./base
 
 configMapGenerator:
-- name: nats-main-config
+- name: nats-config
   behavior: replace
   files:
   - ./config/nats.conf
