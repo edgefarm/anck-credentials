@@ -5,4 +5,7 @@ kind: Kustomization
 namespace: example-nats-sub-2
 
 resources:
-  - ../../../manifest/nats-sub
+  - ../../../manifests/nats-sub
+
+patchesStrategicMerge:
+  - change-sc-k3s.yaml

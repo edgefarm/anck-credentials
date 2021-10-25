@@ -41,11 +41,11 @@ profiles:
         kustomizeArgs: ["--enable-helm"]
         manifests:
         - ./dev/manifests/nats-sub1
-      namespace: dev-nats-sub-1
+      namespace: example-nats-sub-1
     - name: nats-sub2
       kubectl:
         kustomize: true
         kustomizeArgs: ["--enable-helm"]
         manifests:
         - ./dev/manifests/nats-sub2
-      namespace: dev-nats-sub-2
+      namespace: example-nats-sub-2

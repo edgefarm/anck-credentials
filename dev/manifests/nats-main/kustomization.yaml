@@ -6,3 +6,6 @@ namespace: edgefarm-network
 
 resources:
   - ../../../manifests/nats-main
+
+patchesStrategicMerge:
+  - change-sc-k3s.yaml
