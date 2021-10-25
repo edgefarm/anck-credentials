@@ -1,0 +1,32 @@
+# yaml-language-server: https://json.schemastore.org/kustomization.json
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+helmCharts:
+- name: nats
+  namespace: default
+  version: v0.9.0
+  repo: https://nats-io.github.io/k8s/helm/charts/
+  releaseName: leaf
+  valuesInline:
+    nats:
+      jetstream:
+        enabled: true
+        memStorage:
+          enabled: true
+          size: 1Gi
+        fileStorage:
+          enabled: true
+          size: "2Gi"
+          storageDirectory: /data/
+          storageClassName: default
+      cluster:
+        enabled: true
+        replicas: 3
+    leafnodes:
+      enabled: true
+      remotes:
+        - url: "tls://global-nats.network-global.cluster.local"
+    natsbox:
+      enabled: false
+
