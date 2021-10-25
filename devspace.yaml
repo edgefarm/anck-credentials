@@ -21,7 +21,7 @@ deployments:
     kustomize: true
     kustomizeArgs: ["--enable-helm"]
     manifests:
-    - ./example/nats-main
+    - ./dev/manifests/nats-main
   namespace: edgefarm-network
 
 commands:
@@ -40,12 +40,12 @@ profiles:
         kustomize: true
         kustomizeArgs: ["--enable-helm"]
         manifests:
-        - ./example/nats-sub1
-      namespace: example-nats-sub-1
+        - ./dev/manifests/nats-sub1
+      namespace: dev-nats-sub-1
     - name: nats-sub2
       kubectl:
         kustomize: true
         kustomizeArgs: ["--enable-helm"]
         manifests:
-        - ./example/nats-sub2
-      namespace: example-nats-sub-2
+        - ./dev/manifests/nats-sub2
+      namespace: dev-nats-sub-2

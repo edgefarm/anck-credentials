@@ -5,4 +5,4 @@ kind: Kustomization
 namespace: example-nats-sub-1
 
 resources:
-  - ../../manifest/nats-sub
+  - ../../../manifest/nats-sub
