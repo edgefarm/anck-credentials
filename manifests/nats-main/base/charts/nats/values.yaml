@@ -73,9 +73,9 @@ nats:
   # of the NATS Server.
   # NOTE: For this to work the name of the configuration has to be
   # called `nats.conf`.
-  # 
+  #
   # e.g. kubectl create secret generic custom-nats-conf --from-file nats.conf
-  # 
+  #
   # customConfigSecret:
   #  name:
 
@@ -325,7 +325,7 @@ bootconfig:
   image: natsio/nats-boot-config:0.5.4
   pullPolicy: IfNotPresent
   securityContext: {}
-  
+
 # NATS Box
 #
 # https://github.com/nats-io/nats-box

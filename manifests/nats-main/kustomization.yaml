@@ -2,13 +2,11 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 
-namespace: network-global
-
 resources:
   - ./base
 
 configMapGenerator:
-- name: nats-global-config
+- name: nats-main-config
   behavior: replace
   files:
   - ./config/nats.conf

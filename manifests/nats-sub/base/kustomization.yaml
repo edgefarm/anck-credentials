@@ -29,4 +29,3 @@ helmCharts:
         - url: "tls://nats.network-global.cluster.local"
     natsbox:
       enabled: false
-

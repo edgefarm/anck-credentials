@@ -18,4 +18,3 @@ spec:
     matchLabels:
           {{- include "nats.selectorLabels" . | nindent 6 }}
 {{- end }}
-
