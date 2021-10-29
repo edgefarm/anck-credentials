@@ -24,6 +24,6 @@ helmCharts:
         enabled: true
         replicas: 3
     leadnode:
-      enabled: false
+      enabled: true
     natsbox:
       enabled: false
