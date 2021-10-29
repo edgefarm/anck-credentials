@@ -26,6 +26,6 @@ helmCharts:
     leafnodes:
       enabled: true
       remotes:
-        - url: "tls://nats.edgefarm-network.cluster.local"
+        - url: "tls://nats.edgefarm-network"
     natsbox:
       enabled: false
