@@ -43,6 +43,13 @@ deployments:
     - ./dev/manifests/nats-main
   namespace: edgefarm-network
 
+- name: crds
+  kubectl:
+    kustomize: true
+    manifests:
+    - ./dev/manifests/crds
+  namespace: edgefarm-network
+
 profiles:
 - name: user
   merge:
@@ -53,11 +60,17 @@ profiles:
         kustomizeArgs: ["--enable-helm"]
         manifests:
         - ./dev/manifests/user/nats-sub1
-      namespace: user-nats-sub-1
+      namespace: user-nats-sub1
     - name: nats-sub2
       kubectl:
         kustomize: true
         kustomizeArgs: ["--enable-helm"]
         manifests:
         - ./dev/manifests/user/nats-sub2
-      namespace: user-nats-sub-2
+      namespace: user-nats-sub2
+    - name: user-network
+      kubectl:
+        kustomize: true
+        manifests:
+        - ./dev/manifests/user/user-network
+      namespace: user-network
