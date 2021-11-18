@@ -1,0 +1,22 @@
+syntax = "proto3";
+
+package v1alpha1;
+
+message DesiredStateRequest {
+  string account = 1;
+  repeated string username = 2;
+}
+
+message DesiredStateResponse {
+  map<string, string> credentials = 1;
+  string error = 2;
+}
+
+message DeleteAccountRequest { string account = 1; }
+
+message DeleteAccountResponse { string error = 1; }
+
+service ConfigService {
+  rpc DesiredState(DesiredStateRequest) returns (DesiredStateResponse);
+  rpc DeleteAccount(DeleteAccountRequest) returns (DeleteAccountResponse);
+}
