@@ -7,12 +7,12 @@ GO_ARCH = amd64
 all: check test build
 
 build:
-	GOOS=linux GOARCH=${GO_ARCH} go build -o ${BIN_DIR}/credsmanager cmd/credsmanager/main.go
+	GOOS=linux GOARCH=${GO_ARCH} go build ${GO_LDFLAGS} -o ${BIN_DIR}/credsmanager cmd/credsmanager/main.go
 
 proto:
 	go get -d google.golang.org/protobuf/cmd/protoc-gen-go
 	go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@latest
-	protoc -I=pkg/config/v1alpha1 --go_out=pkg/config/v1alpha1 --go-grpc_out=pkg/config/v1alpha1 --go-grpc_opt=paths=source_relative pkg/config/v1alpha1/api.proto
+	protoc -I=pkg/apis/config/v1alpha1/ --go_out=pkg/apis/config/v1alpha1/ --go-grpc_out=pkg/apis/config/v1alpha1/ --go-grpc_opt=paths=source_relative pkg/apis/config/v1alpha1/config.proto
 
 test:
 	go test ./...
@@ -20,5 +20,5 @@ test:
 clean:
 	rm -rf ${BIN_DIR}/credsmanager
 
-.PHONY: check test clean
+.PHONY: check test clean build
 

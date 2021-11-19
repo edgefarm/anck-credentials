@@ -2,37 +2,43 @@ package config
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"net"
-	"time"
 
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/reflection"
 	"google.golang.org/grpc/status"
 
-	api "github.com/edgefarm/edgefarm.network/pkg/config/v1alpha1"
+	api "github.com/edgefarm/edgefarm.network/pkg/apis/config/v1alpha1"
+	"github.com/edgefarm/edgefarm.network/pkg/creds"
 )
 
-type server struct {
-	api.UnimplementedConfigServiceServer
-}
-
 type Config struct {
+	api.UnimplementedConfigServiceServer
+	creds.CredsIf
+	Port int
+	// first string: account
+	// second string: username
+	// third string: credential for user
+	// Credentials map[string]map[string]string
 }
 
-func NewConfig() *Config {
-	return &Config{}
+func NewConfig(port int, creds creds.CredsIf) *Config {
+	return &Config{
+		Port:    port,
+		CredsIf: creds,
+	}
 }
 
 func (c *Config) StartConfigServer() error {
-	port := "6000"
-	lis, err := net.Listen("tcp", "0.0.0.0:"+port)
+	lis, err := net.Listen("tcp", "0.0.0.0:"+fmt.Sprintf("%d", c.Port))
 	if err != nil {
 		log.Fatalf("Error creating listener: %v\n", err)
 	}
 	s := grpc.NewServer()
-	api.RegisterConfigServiceServer(s, &server{})
+	api.RegisterConfigServiceServer(s, c)
 
 	// Register reflection service on gRPC server.
 	reflection.Register(s)
@@ -44,16 +50,28 @@ func (c *Config) StartConfigServer() error {
 	return nil
 }
 
-func (s *server) DesiredState(context.Context, *api.DesiredStateRequest) (*api.DesiredStateResponse, error) {
-	res := &api.DesiredStateResponse{
-		Credentials: map[string]string{},
+func (s *Config) DesiredState(ctx context.Context, req *api.DesiredStateRequest) (*api.DesiredStateResponse, error) {
+	if req.Account == "" {
+		return nil, status.Error(codes.InvalidArgument, "Account cannot be empty")
 	}
-	res.Credentials["user0"] = "password0"
-	res.Credentials["user1"] = "password1"
-	time.Sleep(1 * time.Second)
+	for _, username := range req.Username {
+		if username == "" {
+			return nil, status.Error(codes.InvalidArgument, "Username cannot be empty")
+		}
+	}
+
+	fmt.Printf("Obtaining secrets for account '%s'\n", req.Account)
+	secrets, err := s.CredsIf.DesiredState(req.Account, req.Username)
+	if err != nil {
+		fmt.Printf("Error: %v", err)
+		return nil, err
+	}
+	res := &api.DesiredStateResponse{
+		Credentials: secrets,
+	}
 	return res, nil
 }
 
-func (s *server) DeleteAccount(context.Context, *api.DeleteAccountRequest) (*api.DeleteAccountResponse, error) {
+func (s *Config) DeleteAccount(context.Context, *api.DeleteAccountRequest) (*api.DeleteAccountResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeleteAccount not implemented")
 }

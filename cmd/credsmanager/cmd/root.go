@@ -19,6 +19,8 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/edgefarm/edgefarm.network/pkg/config"
+	"github.com/edgefarm/edgefarm.network/pkg/creds"
 	"github.com/spf13/cobra"
 
 	homedir "github.com/mitchellh/go-homedir"
@@ -41,6 +43,17 @@ to quickly create a Cobra application.`,
 	// has an action associated with it:
 	Run: func(cmd *cobra.Command, args []string) {
 		fmt.Println("credsmanager called")
+		creds := creds.NewCredsSecrets()
+
+		config := config.NewConfig(6000, creds)
+		// add some dummy values
+		// config.Credentials["myAccount"] = map[string]string{"user0": "password0", "user1": "password1"}
+
+		err := config.StartConfigServer()
+		if err != nil {
+			fmt.Println(err)
+			os.Exit(1)
+		}
 	},
 }
 
