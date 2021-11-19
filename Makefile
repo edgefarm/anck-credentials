@@ -6,6 +6,9 @@ GO_ARCH = amd64
 
 all: check test build
 
+check:
+	go mod vendor
+
 build:
 	GOOS=linux GOARCH=${GO_ARCH} go build ${GO_LDFLAGS} -o ${BIN_DIR}/credsmanager cmd/credsmanager/main.go
 
