@@ -12,7 +12,7 @@ message DesiredStateResponse { map<string, string> credentials = 1; }
 
 message DeleteAccountRequest { string account = 1; }
 
-message DeleteAccountResponse { string error = 1; }
+message DeleteAccountResponse {}
 
 service ConfigService {
   rpc DesiredState(DesiredStateRequest) returns (DesiredStateResponse);

@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"net"
+	"strings"
 
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
@@ -15,6 +16,7 @@ import (
 	"github.com/edgefarm/edgefarm.network/pkg/creds"
 )
 
+// Config represents the configuration for the config server
 type Config struct {
 	api.UnimplementedConfigServiceServer
 	creds.CredsIf
@@ -25,6 +27,7 @@ type Config struct {
 	// Credentials map[string]map[string]string
 }
 
+// NewConfig returns a new Config object
 func NewConfig(port int, creds creds.CredsIf) *Config {
 	return &Config{
 		Port:    port,
@@ -32,6 +35,7 @@ func NewConfig(port int, creds creds.CredsIf) *Config {
 	}
 }
 
+// StartConfigServer starts the config grpc server
 func (c *Config) StartConfigServer() error {
 	lis, err := net.Listen("tcp", "0.0.0.0:"+fmt.Sprintf("%d", c.Port))
 	if err != nil {
@@ -50,18 +54,26 @@ func (c *Config) StartConfigServer() error {
 	return nil
 }
 
+// DesiredState rpc constructs the desired state of the credentials
 func (s *Config) DesiredState(ctx context.Context, req *api.DesiredStateRequest) (*api.DesiredStateResponse, error) {
-	if req.Account == "" {
+	account := req.Account
+	// check if account has spaces in it
+	if strings.Contains(account, " ") {
+		return nil, status.Errorf(codes.InvalidArgument, "Account '%s' contains spaces", account)
+	}
+
+	if account == "" {
 		return nil, status.Error(codes.InvalidArgument, "Account cannot be empty")
 	}
+
 	for _, username := range req.Username {
 		if username == "" {
 			return nil, status.Error(codes.InvalidArgument, "Username cannot be empty")
 		}
 	}
 
-	fmt.Printf("Obtaining secrets for account '%s'\n", req.Account)
-	secrets, err := s.CredsIf.DesiredState(req.Account, req.Username)
+	fmt.Printf("Obtaining secrets for account '%s'\n", account)
+	secrets, err := s.CredsIf.DesiredState(account, req.Username)
 	if err != nil {
 		fmt.Printf("Error: %v", err)
 		return nil, err
@@ -72,6 +84,11 @@ func (s *Config) DesiredState(ctx context.Context, req *api.DesiredStateRequest)
 	return res, nil
 }
 
-func (s *Config) DeleteAccount(context.Context, *api.DeleteAccountRequest) (*api.DeleteAccountResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method DeleteAccount not implemented")
+// DeleteAccount rpc deletes the account from the credentials.
+func (s *Config) DeleteAccount(ctx context.Context, req *api.DeleteAccountRequest) (*api.DeleteAccountResponse, error) {
+	err := s.CredsIf.DeleteAccount(req.Account)
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, "Cannot delete account %s", req.Account)
+	}
+	return &api.DeleteAccountResponse{}, nil
 }
