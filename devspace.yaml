@@ -1,0 +1,129 @@
+version: v1beta11
+
+vars:
+  - name: IMAGE
+    value: ci4rail/credsmanager
+
+dependencies:
+  - name: k3d
+    source:
+      git: https://github.com/edgefarm/devspace.base
+      subPath: /environments/k3d
+      branch: rework
+
+  - name: sealed-secrets
+    source:
+      git: https://github.com/edgefarm/devspace.base
+      subPath: /environments/sealed-secrets
+      branch: rework
+
+commands:
+  - name: init
+    command: |-
+      devspace run update
+      devspace run k3d.init
+      devspace run sealed-secrets.init
+
+  - name: purge
+    command: |-
+      devspace run k3d.purge
+
+  - name: activate
+    command: |-
+      devspace run k3d.activate
+
+  - name: update
+    command: |-
+      devspace update dependencies
+
+dev:
+  # `dev.ports` specifies all ports that should be forwarded while `devspace dev` is running
+  # Port-forwarding lets you access your application via localhost on your local machine
+  ports:
+    - imageSelector: ${IMAGE} # Select the Pod that runs our `${IMAGE}`
+      forward:
+        - port: 6000
+        - port: 23450
+          remotePort: 2345
+  # `dev.sync` configures a file sync between our Pods in k8s and your local project files
+  sync:
+    - imageSelector: ${IMAGE} # Select the Pod that runs our `${IMAGE}`
+      excludePaths:
+        - .git/
+  # `dev.terminal` tells DevSpace to open a terminal as a last step during `devspace dev`
+  terminal:
+    imageSelector: ${IMAGE} # Select the Pod that runs our `${IMAGE}`
+    # With this optional `command` we can tell DevSpace to run a script when opening the terminal
+    # This is often useful to display help info for new users or perform initial tasks (e.g. installing dependencies)
+    # DevSpace has generated an example ./devspace_start.sh file in your local project - Feel free to customize it!
+    command:
+      - bash
+
+  # Since our Helm charts and manifests deployments are often optimized for production,
+  # DevSpace let's you swap out Pods dynamically to get a better dev environment
+  replacePods:
+    - imageSelector: ${IMAGE} # Select the Pod that runs our `${IMAGE}`
+      # Since the `${IMAGE}` used to start our main application pod may be distroless or not have any dev tooling, let's replace it with a dev-optimized image
+      # DevSpace provides a sample image here but you can use any image for your specific needs
+      replaceImage: loftsh/go:latest
+      # Besides replacing the container image, let's also apply some patches to the `spec` of our Pod
+      # We are overwriting `command` + `args` for the first container in our selected Pod, so it starts with `sleep 9999999`
+      # Using `sleep 9999999` as PID 1 (instead of the regular ENTRYPOINT), allows you to start the application manually
+      patches:
+        - op: replace
+          path: spec.containers[0].command
+          value:
+            - sleep
+        - op: replace
+          path: spec.containers[0].args
+          value:
+            - "9999999"
+        - op: remove
+          path: spec.containers[0].securityContext
+
+deployments:
+  - name: nats-main
+    kubectl:
+      kustomize: true
+      kustomizeArgs: ["--enable-helm"]
+      manifests:
+        - ./dev/manifests/nats-main
+    namespace: edgefarm-network
+
+  - name: crds
+    kubectl:
+      kustomize: true
+      manifests:
+        - ./dev/manifests/crds
+    namespace: edgefarm-network
+
+  - name: credsmanager
+    kubectl:
+      manifests:
+        - build/kubernetes/
+    namespace: edgefarm-network
+
+profiles:
+  - name: user
+    merge:
+      deployments:
+        - name: nats-sub1
+          kubectl:
+            kustomize: true
+            kustomizeArgs: ["--enable-helm"]
+            manifests:
+              - ./dev/manifests/user/nats-sub1
+          namespace: user-nats-sub1
+        - name: nats-sub2
+          kubectl:
+            kustomize: true
+            kustomizeArgs: ["--enable-helm"]
+            manifests:
+              - ./dev/manifests/user/nats-sub2
+          namespace: user-nats-sub2
+        - name: user-network
+          kubectl:
+            kustomize: true
+            manifests:
+              - ./dev/manifests/user/user-network
+          namespace: user-network

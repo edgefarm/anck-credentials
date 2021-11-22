@@ -1,0 +1,21 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: credsmanager
+  namespace: edgefarm-network
+  labels:
+    app: credsmanager
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: credsmanager
+  template:
+    metadata:
+      labels:
+        app: credsmanager
+    spec:
+      containers:
+        - image: ci4rail/credsmanager
+          name: credsmanager
+      serviceAccountName: credsmanager

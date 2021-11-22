@@ -1,0 +1,6 @@
+apiVersion: network.edgefarm.io/v1alpha1
+kind: Network
+metadata:
+  name: user-network
+spec:
+  size: 3

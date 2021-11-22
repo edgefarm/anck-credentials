@@ -1,0 +1,11 @@
+# yaml-language-server: https://json.schemastore.org/kustomization.json
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: user-nats-sub2
+
+resources:
+  - ../../../../manifests/nats-sub
+
+patchesStrategicMerge:
+  - change-sc-k3s.yaml
