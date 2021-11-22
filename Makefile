@@ -24,4 +24,3 @@ clean:
 	rm -rf ${BIN_DIR}/credsmanager
 
 .PHONY: check test clean build
-
