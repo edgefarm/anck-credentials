@@ -1,7 +1,7 @@
 
 BIN_DIR ?= ./bin
 VERSION ?= $(shell git describe --match=NeVeRmAtCh --always --abbrev=40 --dirty)
-GO_LDFLAGS = -tags 'netgo osusergo static_build'
+GO_LDFLAGS = -tags 'netgo osusergo static_build' -ldflags "-X github.com/edgefarm/edgefarm.network/cmd/credsmanager/cmd.version=$(VERSION)"
 GO_ARCH = amd64
 
 all: check test build

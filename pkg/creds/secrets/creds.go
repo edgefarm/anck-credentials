@@ -1,3 +1,16 @@
+/*
+Copyright © 2021 Ci4Rail GmbH <engineering@ci4rail.com>
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+    http://www.apache.org/licenses/LICENSE-2.0
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
 package secrets
 
 import (
@@ -57,7 +70,7 @@ func NewCredsSecrets() *CredsSecrets {
 
 func (c *CredsSecrets) getUnusedNatsAccounts(state *State) ([]string, error) {
 	unusedNatsAccounts := []string{}
-	secrets, err := c.client.CoreV1().Secrets(namespace).List(context.TODO(), metav1.ListOptions{
+	secrets, err := c.client.CoreV1().Secrets(namespace).List(context.Background(), metav1.ListOptions{
 		LabelSelector: "natsfunction=users",
 	})
 	if err != nil {
@@ -143,7 +156,7 @@ func (c *CredsSecrets) DesiredState(applicationName string, usernames []string) 
 		}
 	}
 
-	secrets, err := c.client.CoreV1().Secrets(namespace).List(context.TODO(), metav1.ListOptions{
+	secrets, err := c.client.CoreV1().Secrets(namespace).List(context.Background(), metav1.ListOptions{
 		LabelSelector: fmt.Sprintf("natsaccount=%s,natsfunction=users", natsAccount),
 	})
 
@@ -163,7 +176,7 @@ func (c *CredsSecrets) DesiredState(applicationName string, usernames []string) 
 	return res, nil
 }
 
-// DeleteAccount deletes the account from the credentials. Not needed in this implementation.
+// DeleteAccount deletes the account from the credentials.
 func (c *CredsSecrets) DeleteAccount(applicationName string) error {
 	// check if the account is used.
 	// if used delete it
@@ -171,12 +184,18 @@ func (c *CredsSecrets) DeleteAccount(applicationName string) error {
 	if err != nil {
 		return fmt.Errorf("cannot read state, err: %v", err)
 	}
+	accountUsed := false
 	for i, usedAccount := range state.UsedAccounts {
 		if usedAccount.ApplicationName == applicationName {
 			state.UsedAccounts = append(state.UsedAccounts[:i], state.UsedAccounts[i+1:]...)
+			accountUsed = true
 			break
 		}
 	}
+	if !accountUsed {
+		return fmt.Errorf("'%s' not used", applicationName)
+	}
+
 	err = UpdateState(c.client, state)
 	if err != nil {
 		return fmt.Errorf("cannot update state, err: %v", err)
