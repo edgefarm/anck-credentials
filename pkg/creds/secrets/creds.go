@@ -26,7 +26,7 @@ import (
 const (
 	namespace     = "edgefarm-network"
 	stateSecret   = "credsmanagerstate"
-	fixedUsername = "device"
+	fixedUsername = "user"
 )
 
 // CredsSecrets implements CredsIf using Kubernetes secrets
