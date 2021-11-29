@@ -138,7 +138,7 @@ func removeAccount(slice []string, s string) ([]string, error) {
 }
 
 // DesiredState constructs the desired state of credentials for a given application name
-func (c *CredsSecrets) DesiredState(applicationName string, usernames []string) (*api.DesiredStateResponse, error) {
+func (c *CredsSecrets) DesiredState(accountName string, usernames []string) (*api.DesiredStateResponse, error) {
 	var natsAccount = ""
 
 	// Check current state if application name is already used
@@ -147,14 +147,14 @@ func (c *CredsSecrets) DesiredState(applicationName string, usernames []string) 
 		return nil, fmt.Errorf("DesiredState: cannot read state, err: %v", err)
 	}
 	for _, s := range state.UsedAccounts {
-		if s.ApplicationName == applicationName {
+		if s.ApplicationName == accountName {
 			natsAccount = s.Account
 		}
 	}
 
 	// Reserve new nats account if possible
 	if natsAccount == "" {
-		natsAccount, err = c.AllocateNatsAccount(applicationName)
+		natsAccount, err = c.AllocateNatsAccount(accountName)
 		if err != nil {
 			return nil, err
 		}
@@ -169,7 +169,7 @@ func (c *CredsSecrets) DesiredState(applicationName string, usernames []string) 
 	}
 
 	if len(secrets.Items) == 0 {
-		return nil, fmt.Errorf("no secrets found for applicationName %s", applicationName)
+		return nil, fmt.Errorf("no secrets found for account %s", accountName)
 	}
 
 	userCreds := []*api.Credentials{}
@@ -181,16 +181,14 @@ func (c *CredsSecrets) DesiredState(applicationName string, usernames []string) 
 			return nil, fmt.Errorf("cannot generate random string for user %s", user)
 		}
 		userCreds = append(userCreds, &api.Credentials{
-			Username: user,
-			Password: secret,
+			Username:        user,
+			Password:        secret,
+			Creds:           string(secrets.Items[0].Data[fixedUsername]),
+			UserAccountName: fmt.Sprintf("%s_%s", accountName, user),
 		})
 	}
-	fmt.Printf("Mapped nats account '%s' to application '%s'\n", natsAccount, applicationName)
+	fmt.Printf("Mapped nats account '%s' to account '%s'\n", natsAccount, accountName)
 	res := &api.DesiredStateResponse{
-		Accounts: &api.Account{
-			Account: applicationName,
-			Creds:   string(secrets.Items[0].Data[fixedUsername]),
-		},
 		Creds: userCreds,
 	}
 	return res, nil
@@ -211,7 +209,7 @@ func GenerateRandomString(n int) (string, error) {
 }
 
 // DeleteAccount deletes the account from the credentials.
-func (c *CredsSecrets) DeleteAccount(applicationName string) error {
+func (c *CredsSecrets) DeleteAccount(accountName string) error {
 	// check if the account is used.
 	// if used delete it
 	state, err := ReadState(c.client)
@@ -220,7 +218,7 @@ func (c *CredsSecrets) DeleteAccount(applicationName string) error {
 	}
 	accountUsed := false
 	for i, usedAccount := range state.UsedAccounts {
-		if usedAccount.ApplicationName == applicationName {
+		if usedAccount.ApplicationName == accountName {
 			fmt.Printf("Freeing nats account '%s'\n", usedAccount.Account)
 			state.UsedAccounts = append(state.UsedAccounts[:i], state.UsedAccounts[i+1:]...)
 			accountUsed = true
@@ -228,7 +226,7 @@ func (c *CredsSecrets) DeleteAccount(applicationName string) error {
 		}
 	}
 	if !accountUsed {
-		return fmt.Errorf("'%s' not used", applicationName)
+		return fmt.Errorf("'%s' not used", accountName)
 	}
 
 	err = UpdateState(c.client, state)
