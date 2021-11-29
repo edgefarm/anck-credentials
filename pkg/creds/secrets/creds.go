@@ -207,7 +207,7 @@ func (c *CredsSecrets) DesiredState(accountName string, usernames []string) (*ap
 			Username:        user,
 			Password:        secret,
 			Creds:           string(secrets.Items[0].Data[fixedUsername]),
-			UserAccountName: fmt.Sprintf("%s_%s", accountName, user),
+			UserAccountName: fmt.Sprintf("%s.%s", accountName, user),
 		})
 	}
 
