@@ -28,9 +28,10 @@ import (
 )
 
 const (
-	namespace     = "edgefarm-network"
-	stateSecret   = "credsmanagerstate"
-	fixedUsername = "user"
+	namespace      = "edgefarm-network"
+	stateSecret    = "credsmanagerstate"
+	fixedUsername  = "user"
+	passwortLength = 30
 )
 
 // CredsSecrets implements CredsIf using Kubernetes secrets
@@ -198,7 +199,7 @@ func (c *CredsSecrets) DesiredState(accountName string, usernames []string) (*ap
 
 	for _, user := range unconfigured {
 		fmt.Printf("Generating secret for user %s\n", user)
-		secret, err := GenerateRandomString(30)
+		secret, err := GenerateRandomString(passwortLength)
 		if err != nil {
 			return nil, fmt.Errorf("cannot generate random string for user %s", user)
 		}
