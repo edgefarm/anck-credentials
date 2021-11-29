@@ -158,6 +158,10 @@ func (c *CredsSecrets) DesiredState(accountName string, usernames []string) (*ap
 		if err != nil {
 			return nil, err
 		}
+		c.State, err = ReadState(c.client)
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	secrets, err := c.client.CoreV1().Secrets(namespace).List(context.Background(), metav1.ListOptions{
@@ -187,6 +191,26 @@ func (c *CredsSecrets) DesiredState(accountName string, usernames []string) (*ap
 			UserAccountName: fmt.Sprintf("%s_%s", accountName, user),
 		})
 	}
+
+	userMappingIndex := -1
+	for i, mapping := range c.State.UserMappings {
+		if mapping.ApplicationName == accountName {
+			userMappingIndex = i
+		}
+	}
+	if userMappingIndex == -1 {
+		c.State.UserMappings = append(c.State.UserMappings, UserMapping{
+			ApplicationName: accountName,
+			Credentials:     userCreds,
+		})
+	} else {
+		c.State.UserMappings[userMappingIndex].Credentials = userCreds
+	}
+	err = UpdateState(c.client, c.State)
+	if err != nil {
+		return nil, fmt.Errorf("cannot update state")
+	}
+
 	fmt.Printf("Mapped nats account '%s' to account '%s'\n", natsAccount, accountName)
 	res := &api.DesiredStateResponse{
 		Creds: userCreds,
