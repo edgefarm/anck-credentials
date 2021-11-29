@@ -27,6 +27,8 @@ import (
 type NatsAccountMapping struct {
 	Account         string `json:"Account"`
 	ApplicationName string `json:"Application"`
+	Username        string `json:"Username"`
+	Password        string `json:"Password"`
 }
 
 // State stores the current state of the credsmanager

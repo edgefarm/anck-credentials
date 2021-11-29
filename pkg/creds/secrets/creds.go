@@ -15,12 +15,16 @@ package secrets
 
 import (
 	"context"
+	"crypto/rand"
 	"fmt"
+	"math/big"
 
 	"github.com/edgefarm/edgefarm.network/pkg/creds"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
+
+	api "github.com/edgefarm/edgefarm.network/pkg/apis/config/v1alpha1"
 )
 
 const (
@@ -134,7 +138,7 @@ func removeAccount(slice []string, s string) ([]string, error) {
 }
 
 // DesiredState constructs the desired state of credentials for a given application name
-func (c *CredsSecrets) DesiredState(applicationName string, usernames []string) (map[string]string, error) {
+func (c *CredsSecrets) DesiredState(applicationName string, usernames []string) (*api.DesiredStateResponse, error) {
 	var natsAccount = ""
 
 	// Check current state if application name is already used
@@ -168,12 +172,42 @@ func (c *CredsSecrets) DesiredState(applicationName string, usernames []string) 
 		return nil, fmt.Errorf("no secrets found for applicationName %s", applicationName)
 	}
 
-	res := map[string]string{}
+	userCreds := []*api.Credentials{}
+
 	for _, user := range usernames {
-		res[user] = string(secrets.Items[0].Data[fixedUsername])
+		fmt.Printf("Generating secret for user %s\n", user)
+		secret, err := GenerateRandomString(20)
+		if err != nil {
+			return nil, fmt.Errorf("cannot generate random string for user %s", user)
+		}
+		userCreds = append(userCreds, &api.Credentials{
+			Username: user,
+			Password: secret,
+		})
+	}
+	fmt.Printf("Mapped nats account '%s' to application '%s'\n", natsAccount, applicationName)
+	res := &api.DesiredStateResponse{
+		Accounts: &api.Account{
+			Account: applicationName,
+			Creds:   string(secrets.Items[0].Data[fixedUsername]),
+		},
+		Creds: userCreds,
+	}
+	return res, nil
+}
+
+func GenerateRandomString(n int) (string, error) {
+	const letters = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz-"
+	ret := make([]byte, n)
+	for i := 0; i < n; i++ {
+		num, err := rand.Int(rand.Reader, big.NewInt(int64(len(letters))))
+		if err != nil {
+			return "", err
+		}
+		ret[i] = letters[num.Int64()]
 	}
 
-	return res, nil
+	return string(ret), nil
 }
 
 // DeleteAccount deletes the account from the credentials.
@@ -187,6 +221,7 @@ func (c *CredsSecrets) DeleteAccount(applicationName string) error {
 	accountUsed := false
 	for i, usedAccount := range state.UsedAccounts {
 		if usedAccount.ApplicationName == applicationName {
+			fmt.Printf("Freeing nats account '%s'\n", usedAccount.Account)
 			state.UsedAccounts = append(state.UsedAccounts[:i], state.UsedAccounts[i+1:]...)
 			accountUsed = true
 			break

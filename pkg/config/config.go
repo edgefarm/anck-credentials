@@ -87,10 +87,7 @@ func (s *Config) DesiredState(ctx context.Context, req *api.DesiredStateRequest)
 		fmt.Printf("Error: %v", err)
 		return nil, err
 	}
-	res := &api.DesiredStateResponse{
-		Credentials: secrets,
-	}
-	return res, nil
+	return secrets, nil
 }
 
 // DeleteAccount rpc deletes the account from the credentials.

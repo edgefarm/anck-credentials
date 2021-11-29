@@ -21,7 +21,20 @@ message DesiredStateRequest {
   repeated string username = 2;
 }
 
-message DesiredStateResponse { map<string, string> credentials = 1; }
+message Credentials {
+  string username = 1;
+  string password = 2;
+}
+
+message Account {
+  string account = 1;
+  string creds = 2;
+}
+
+message DesiredStateResponse {
+  Account accounts = 1;
+  repeated Credentials creds = 2;
+}
 
 message DeleteAccountRequest { string account = 1; }
 
