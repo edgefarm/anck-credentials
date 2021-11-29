@@ -175,12 +175,30 @@ func (c *CredsSecrets) DesiredState(accountName string, usernames []string) (*ap
 	if len(secrets.Items) == 0 {
 		return nil, fmt.Errorf("no secrets found for account %s", accountName)
 	}
-
+	accountNameIndex := -1
+	configuredUsers := func() []string {
+		var users []string
+		for i, user := range c.State.UserMappings {
+			if user.ApplicationName == accountName {
+				accountNameIndex = i
+				for _, creds := range user.Credentials {
+					users = append(users, creds.Username)
+				}
+			}
+		}
+		return users
+	}()
+	unconfigured, deleted := unconfiguredUsers(configuredUsers, usernames)
+	fmt.Println("Unconfigured users: ", unconfigured)
+	fmt.Println("Deleted users: ", deleted)
 	userCreds := []*api.Credentials{}
+	if accountNameIndex != -1 {
+		userCreds = c.State.UserMappings[accountNameIndex].Credentials
+	}
 
-	for _, user := range usernames {
+	for _, user := range unconfigured {
 		fmt.Printf("Generating secret for user %s\n", user)
-		secret, err := GenerateRandomString(20)
+		secret, err := GenerateRandomString(30)
 		if err != nil {
 			return nil, fmt.Errorf("cannot generate random string for user %s", user)
 		}
@@ -190,6 +208,15 @@ func (c *CredsSecrets) DesiredState(accountName string, usernames []string) (*ap
 			Creds:           string(secrets.Items[0].Data[fixedUsername]),
 			UserAccountName: fmt.Sprintf("%s_%s", accountName, user),
 		})
+	}
+
+	for _, user := range deleted {
+		fmt.Printf("Deleting secret for user %s\n", user)
+		for i, creds := range userCreds {
+			if creds.Username == user {
+				userCreds = append(userCreds[:i], userCreds[i+1:]...)
+			}
+		}
 	}
 
 	userMappingIndex := -1
@@ -217,6 +244,56 @@ func (c *CredsSecrets) DesiredState(accountName string, usernames []string) (*ap
 	}
 	return res, nil
 }
+
+// unconfiguredUsers returns two lists:
+// 1. a list of users that are not configured yet
+// 2. a list of users that are considered as deleted
+func unconfiguredUsers(currentlyConfigured []string, userList []string) ([]string, []string) {
+	var unconfigured []string
+	var deleted []string
+	for _, user := range userList {
+		if !contains(currentlyConfigured, user) {
+			unconfigured = append(unconfigured, user)
+		}
+	}
+	for _, user := range currentlyConfigured {
+		if !contains(userList, user) {
+			deleted = append(deleted, user)
+		}
+	}
+	return unconfigured, deleted
+}
+
+func contains(s []string, e string) bool {
+	for _, a := range s {
+		if a == e {
+			return true
+		}
+	}
+	return false
+}
+
+// var diff []string
+// for i := 0; i < 2; i++ {
+// 	for _, s1 := range currentlyConfigured {
+// 		found := false
+// 		for _, s2 := range users2 {
+// 			if s1 == s2 {
+// 				found = true
+// 				break
+// 			}
+// 		}
+// 		// String not found. We add it to return slice
+// 		if !found {
+// 			diff = append(diff, s1)
+// 		}
+// 	}
+// 	// Swap the slices, only if it was the first loop
+// 	if i == 0 {
+// 		currentlyConfigured, users2 = users2, currentlyConfigured
+// 	}
+// }
+// return diff
 
 func GenerateRandomString(n int) (string, error) {
 	const letters = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz-"

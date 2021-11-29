@@ -38,9 +38,10 @@ type UserMapping struct {
 
 // State stores the current state of the credsmanager
 type State struct {
-	// UsedAccounts slice of used accounts
+	// UsedAccounts map the used ngs nats account to the account name specified by the user
 	UsedAccounts []NatsAccountMapping `json:"usedaccounts"`
-	UserMappings []UserMapping        `json:"usermapping"`
+	// UserMappings map the user specified account name to the credentials
+	UserMappings []UserMapping `json:"usermapping"`
 }
 
 // ReadState reads the state of the credentials and returns struct State
