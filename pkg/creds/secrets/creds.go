@@ -241,7 +241,8 @@ func (c *CredsSecrets) DesiredState(accountName string, usernames []string) (*ap
 
 	fmt.Printf("Mapped nats account '%s' to account '%s'\n", natsAccount, accountName)
 	res := &api.DesiredStateResponse{
-		Creds: userCreds,
+		Creds:            userCreds,
+		DeletedUsernames: deleted,
 	}
 	return res, nil
 }
