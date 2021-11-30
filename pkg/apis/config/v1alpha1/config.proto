@@ -30,7 +30,7 @@ message Credentials {
 
 message DesiredStateResponse {
   repeated Credentials creds = 1;
-  repeated string deletedUsernames = 2;
+  repeated string deletedUserAccountNames = 2;
 }
 
 message DeleteAccountRequest { string accountName = 1; }

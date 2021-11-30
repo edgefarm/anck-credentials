@@ -241,8 +241,14 @@ func (c *CredsSecrets) DesiredState(accountName string, usernames []string) (*ap
 
 	fmt.Printf("Mapped nats account '%s' to account '%s'\n", natsAccount, accountName)
 	res := &api.DesiredStateResponse{
-		Creds:            userCreds,
-		DeletedUsernames: deleted,
+		Creds: userCreds,
+		DeletedUserAccountNames: func() []string {
+			deletedUserAccountNames := []string{}
+			for _, user := range deleted {
+				deletedUserAccountNames = append(deletedUserAccountNames, fmt.Sprintf("%s.%s", accountName, user))
+			}
+			return deletedUserAccountNames
+		}(),
 	}
 	return res, nil
 }
