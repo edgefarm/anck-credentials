@@ -17,13 +17,23 @@ package v1alpha1;
 option go_package = ".;v1alpha1";
 
 message DesiredStateRequest {
-  string account = 1;
+  string accountName = 1;
   repeated string username = 2;
 }
 
-message DesiredStateResponse { map<string, string> credentials = 1; }
+message Credentials {
+  string userAccountName = 1;
+  string username = 2;
+  string password = 3;
+  string creds = 4;
+}
 
-message DeleteAccountRequest { string account = 1; }
+message DesiredStateResponse {
+  repeated Credentials creds = 1;
+  repeated string deletedUserAccountNames = 2;
+}
+
+message DeleteAccountRequest { string accountName = 1; }
 
 message DeleteAccountResponse {}
 

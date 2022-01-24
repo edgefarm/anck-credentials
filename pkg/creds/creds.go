@@ -13,9 +13,13 @@ limitations under the License.
 
 package creds
 
+import (
+	api "github.com/edgefarm/edgefarm.network/pkg/apis/config/v1alpha1"
+)
+
 // If is an interface to handle the different sources of credentials.
 type CredsIf interface {
-	DesiredState(account string, usernames []string) (map[string]string, error)
+	DesiredState(account string, usernames []string) (*api.DesiredStateResponse, error)
 	DeleteAccount(account string) error
 }
 

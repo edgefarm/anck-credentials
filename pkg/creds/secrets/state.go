@@ -18,6 +18,7 @@ import (
 	"encoding/json"
 	"fmt"
 
+	api "github.com/edgefarm/edgefarm.network/pkg/apis/config/v1alpha1"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
@@ -25,14 +26,22 @@ import (
 
 // State stores the current state of the credentials (all used accounts)
 type NatsAccountMapping struct {
-	Account         string `json:"Account"`
-	ApplicationName string `json:"Application"`
+	Account         string `json:"account"`
+	ApplicationName string `json:"application"`
+}
+
+// State stores information about the current state of the credentials
+type UserMapping struct {
+	ApplicationName string             `json:"application"`
+	Credentials     []*api.Credentials `json:"credentials"`
 }
 
 // State stores the current state of the credsmanager
 type State struct {
-	// UsedAccounts slice of used accounts
-	UsedAccounts []NatsAccountMapping `json:"usedAccounts"`
+	// UsedAccounts map the used ngs nats account to the account name specified by the user
+	UsedAccounts []NatsAccountMapping `json:"usedaccounts"`
+	// UserMappings map the user specified account name to the credentials
+	UserMappings []UserMapping `json:"usermapping"`
 }
 
 // ReadState reads the state of the credentials and returns struct State

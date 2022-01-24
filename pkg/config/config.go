@@ -65,14 +65,14 @@ func (c *Config) StartConfigServer() error {
 
 // DesiredState rpc constructs the desired state of the credentials
 func (s *Config) DesiredState(ctx context.Context, req *api.DesiredStateRequest) (*api.DesiredStateResponse, error) {
-	account := req.Account
+	accountName := req.AccountName
 	// check if account has spaces in it
-	if strings.Contains(account, " ") {
-		return nil, status.Errorf(codes.InvalidArgument, "Account '%s' contains spaces", account)
+	if strings.Contains(accountName, " ") {
+		return nil, status.Errorf(codes.InvalidArgument, "AccountName '%s' contains spaces", accountName)
 	}
 
-	if account == "" {
-		return nil, status.Error(codes.InvalidArgument, "Account cannot be empty")
+	if accountName == "" {
+		return nil, status.Error(codes.InvalidArgument, "AccountName cannot be empty")
 	}
 
 	for _, username := range req.Username {
@@ -81,24 +81,21 @@ func (s *Config) DesiredState(ctx context.Context, req *api.DesiredStateRequest)
 		}
 	}
 
-	fmt.Printf("Obtaining secrets for account '%s'\n", account)
-	secrets, err := s.CredsIf.DesiredState(account, req.Username)
+	fmt.Printf("Obtaining secrets for account name '%s'\n", accountName)
+	secrets, err := s.CredsIf.DesiredState(accountName, req.Username)
 	if err != nil {
 		fmt.Printf("Error: %v", err)
 		return nil, err
 	}
-	res := &api.DesiredStateResponse{
-		Credentials: secrets,
-	}
-	return res, nil
+	return secrets, nil
 }
 
 // DeleteAccount rpc deletes the account from the credentials.
 func (s *Config) DeleteAccount(ctx context.Context, req *api.DeleteAccountRequest) (*api.DeleteAccountResponse, error) {
-	fmt.Printf("Deleting account '%s'\n", req.Account)
-	err := s.CredsIf.DeleteAccount(req.Account)
+	fmt.Printf("Deleting account '%s'\n", req.AccountName)
+	err := s.CredsIf.DeleteAccount(req.AccountName)
 	if err != nil {
-		return nil, status.Errorf(codes.Internal, "Cannot delete account %s", req.Account)
+		return nil, status.Errorf(codes.Internal, "Cannot delete account %s", req.AccountName)
 	}
 	return &api.DeleteAccountResponse{}, nil
 }
