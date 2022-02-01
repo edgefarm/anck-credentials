@@ -4,23 +4,26 @@ VERSION ?= $(shell git describe --match=NeVeRmAtCh --always --abbrev=40 --dirty)
 GO_LDFLAGS = -tags 'netgo osusergo static_build' -ldflags "-X github.com/edgefarm/edgefarm.network/cmd/credsmanager/cmd.version=$(VERSION)"
 GO_ARCH = amd64
 
-all: check test build
+all: tidy test build ## default target: tidy, test, build
 
-check:
+tidy: ## ensure that go dependencies are up to date
 	go mod vendor
 
-build:
+build: ## build credsmanager
 	GOOS=linux GOARCH=${GO_ARCH} go build ${GO_LDFLAGS} -o ${BIN_DIR}/credsmanager cmd/credsmanager/main.go
 
-proto:
+proto: ## generate proto files
 	go get -d google.golang.org/protobuf/cmd/protoc-gen-go
 	go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@latest
 	protoc -I=pkg/apis/config/v1alpha1/ --go_out=pkg/apis/config/v1alpha1/ --go-grpc_out=pkg/apis/config/v1alpha1/ --go-grpc_opt=paths=source_relative pkg/apis/config/v1alpha1/config.proto
 
-test:
+test: ## run go tests
 	go test ./...
 
-clean:
+clean: ## cleans all
 	rm -rf ${BIN_DIR}/credsmanager
 
-.PHONY: check test clean build
+.PHONY: all tidiy build proto tes clean help
+
+help: ## show help message
+	@awk 'BEGIN {FS = ":.*##"; printf "\nUsage:\n  make [target]\033[36m\033[0m\n"} /^[$$()% 0-9a-zA-Z_-]+:.*?##/ { printf "  \033[36m%-15s\033[0m\t %s\n", $$1, $$2 } /^##@/ { printf "\n\033[1m%s\033[0m\n", substr($$0, 5) } ' $(MAKEFILE_LIST)
