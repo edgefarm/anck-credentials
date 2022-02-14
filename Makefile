@@ -1,7 +1,7 @@
 
 BIN_DIR ?= ./bin
 VERSION ?= $(shell git describe --match=NeVeRmAtCh --always --abbrev=40 --dirty)
-GO_LDFLAGS = -tags 'netgo osusergo static_build' -ldflags "-X github.com/edgefarm/edgefarm.network/cmd/credsmanager/cmd.version=$(VERSION)"
+GO_LDFLAGS = -tags 'netgo osusergo static_build' -ldflags "-X github.com/edgefarm/anck-credentials/cmd/anck-credentials/cmd.version=$(VERSION)"
 GO_ARCH = amd64
 
 all: tidy test build ## default target: tidy, test, build
@@ -9,8 +9,8 @@ all: tidy test build ## default target: tidy, test, build
 tidy: ## ensure that go dependencies are up to date
 	go mod vendor
 
-build: ## build credsmanager
-	GOOS=linux GOARCH=${GO_ARCH} go build ${GO_LDFLAGS} -o ${BIN_DIR}/credsmanager cmd/credsmanager/main.go
+build: ## build anck-credentials
+	GOOS=linux GOARCH=${GO_ARCH} go build ${GO_LDFLAGS} -o ${BIN_DIR}/anck-credentials cmd/anck-credentials/main.go
 
 proto: ## generate proto files
 	go get -d google.golang.org/protobuf/cmd/protoc-gen-go
@@ -21,7 +21,7 @@ test: ## run go tests
 	go test ./...
 
 clean: ## cleans all
-	rm -rf ${BIN_DIR}/credsmanager
+	rm -rf ${BIN_DIR}/anck-credentials
 
 .PHONY: all tidiy build proto tes clean help
 

@@ -4,5 +4,5 @@ COPY . .
 RUN make
 
 FROM alpine:3.14
-COPY --from=builder /code/bin/credsmanager /credsmanager
-ENTRYPOINT ["/credsmanager"]
+COPY --from=builder /code/bin/anck-credentials /anck-credentials
+ENTRYPOINT ["/anck-credentials"]

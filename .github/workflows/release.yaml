@@ -22,7 +22,7 @@ env:
   DOCKER_REPOSITORY: ci4rail
   DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
   DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
-  NAME: credsmanager
+  NAME: anck-credentials
 
 jobs:
   build-docker-image:

@@ -25,8 +25,8 @@ import (
 	"google.golang.org/grpc/reflection"
 	"google.golang.org/grpc/status"
 
-	api "github.com/edgefarm/edgefarm.network/pkg/apis/config/v1alpha1"
-	"github.com/edgefarm/edgefarm.network/pkg/creds"
+	api "github.com/edgefarm/anck-credentials/pkg/apis/config/v1alpha1"
+	"github.com/edgefarm/anck-credentials/pkg/creds"
 )
 
 // Config represents the configuration for the config server

@@ -1,23 +1,23 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: credsmanager
-  namespace: edgefarm-network
+  name: anck-credentials
+  namespace: anck
   labels:
-    app: credsmanager
+    app: anck-credentials
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: credsmanager
+      app: anck-credentials
   template:
     metadata:
       labels:
-        app: credsmanager
+        app: anck-credentials
     spec:
       containers:
-        - image: ci4rail/credsmanager
-          name: credsmanager
+        - image: ci4rail/anck-credentials
+          name: anck-credentials
           resources:
             requests:
               memory: "64Mi"
@@ -25,4 +25,4 @@ spec:
             limits:
               memory: "128Mi"
               cpu: "500m"
-      serviceAccountName: credsmanager
+      serviceAccountName: anck-credentials

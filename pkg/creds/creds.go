@@ -14,7 +14,7 @@ limitations under the License.
 package creds
 
 import (
-	api "github.com/edgefarm/edgefarm.network/pkg/apis/config/v1alpha1"
+	api "github.com/edgefarm/anck-credentials/pkg/apis/config/v1alpha1"
 )
 
 // If is an interface to handle the different sources of credentials.

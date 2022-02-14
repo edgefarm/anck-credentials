@@ -11,27 +11,10 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package cmd
+package main
 
-import (
-	"fmt"
+import "github.com/edgefarm/anck-credentials/cmd/anck-credentials/cmd"
 
-	"github.com/spf13/cobra"
-)
-
-var version = "dev"
-
-var versionCmd = &cobra.Command{
-	Use:   "version",
-	Short: "Print version information and quit",
-	Long: `Print version information and quit
-
-This command displays version information for the credsmanager.`,
-	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Printf("credsmanager %s\n", version)
-	},
-}
-
-func init() {
-	rootCmd.AddCommand(versionCmd)
+func main() {
+	cmd.Execute()
 }

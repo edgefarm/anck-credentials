@@ -1,8 +1,6 @@
-# edgefarm.network
+# anck-credentials
 
-EdgeFarm networking layer
+Edgefarm Application Networking Credentials Manager
 
-## credsmanager
-
-The credsmanager opens a port (default: 6000) and listens for incoming grpc client connections (see [pkg/apis/v1alpha1/config.proto](pkg/apis/v1alpha1/config.proto)).
+The `anck-credentials` opens a port (default: 6000) and listens for incoming grpc client connections (see [pkg/apis/v1alpha1/config.proto](pkg/apis/v1alpha1/config.proto)).
 It handles requests for nats credentails and returns them to the client.

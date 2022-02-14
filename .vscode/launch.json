@@ -5,7 +5,7 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "credsmanager localhost:23450",
+            "name": "anck-credentials localhost:23450",
             "type": "go",
             "request": "attach",
             "mode": "remote",

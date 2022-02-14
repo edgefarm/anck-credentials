@@ -19,17 +19,17 @@ import (
 	"fmt"
 	"math/big"
 
-	"github.com/edgefarm/edgefarm.network/pkg/creds"
+	"github.com/edgefarm/anck-credentials/pkg/creds"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
 
-	api "github.com/edgefarm/edgefarm.network/pkg/apis/config/v1alpha1"
+	api "github.com/edgefarm/anck-credentials/pkg/apis/config/v1alpha1"
 )
 
 const (
-	namespace      = "edgefarm-network"
-	stateSecret    = "credsmanagerstate"
+	namespace      = "anck"
+	stateSecret    = "anck-credentials-state"
 	fixedUsername  = "user"
 	passwortLength = 30
 )

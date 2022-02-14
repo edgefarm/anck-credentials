@@ -17,8 +17,8 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/edgefarm/edgefarm.network/pkg/config"
-	"github.com/edgefarm/edgefarm.network/pkg/creds/secrets"
+	"github.com/edgefarm/anck-credentials/pkg/config"
+	"github.com/edgefarm/anck-credentials/pkg/creds/secrets"
 	"github.com/spf13/cobra"
 )
 
@@ -28,11 +28,11 @@ var (
 
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
-	Use:   "credsmanager",
-	Short: "Manages nats credentials for applications",
-	Long:  `Manages nats credentials for applications using grpc as client interface`,
+	Use:   "anck-credentials",
+	Short: "Manages credentials for edgefarm applications networking",
+	Long:  `Manages credentials for edgefarm applications networking using grpc as client interface`,
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("credsmanager called")
+		fmt.Println("anck-credentials called")
 		creds := secrets.NewCredsSecrets()
 		config := config.NewConfig(grpcPort, creds)
 		err := config.StartConfigServer()
@@ -53,6 +53,5 @@ func Execute() {
 }
 
 func init() {
-	// rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.credsmanager.yaml)")
 	rootCmd.PersistentFlags().IntVar(&grpcPort, "port", 6000, "port of grpc server")
 }

@@ -18,7 +18,7 @@ import (
 	"encoding/json"
 	"fmt"
 
-	api "github.com/edgefarm/edgefarm.network/pkg/apis/config/v1alpha1"
+	api "github.com/edgefarm/anck-credentials/pkg/apis/config/v1alpha1"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
@@ -36,7 +36,7 @@ type UserMapping struct {
 	Credentials     []*api.Credentials `json:"credentials"`
 }
 
-// State stores the current state of the credsmanager
+// State stores the current state of the anck-credentials
 type State struct {
 	// UsedAccounts map the used ngs nats account to the account name specified by the user
 	UsedAccounts []NatsAccountMapping `json:"usedaccounts"`

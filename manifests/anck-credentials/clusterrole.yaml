@@ -1,9 +1,9 @@
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
-  name: credsmanager
+  name: anck-credentials
   labels:
-    k8s-app: credsmanager
+    k8s-app: anck-credentials
 rules:
   - apiGroups: [""]
     resources: ["secrets"]

@@ -2,14 +2,14 @@ version: v1beta11
 
 vars:
   - name: IMAGE
-    value: ci4rail/credsmanager
+    value: ci4rail/anck-credentials
 
 dependencies:
   - name: k3d
     source:
       git: https://github.com/edgefarm/devspace.base
       subPath: /environments/k3d
-      branch: rework
+      branch: main
 
 commands:
   - name: init
@@ -75,8 +75,8 @@ dev:
           path: spec.containers[0].securityContext
 
 deployments:
-  - name: credsmanager
+  - name: anck-credentials
     kubectl:
       manifests:
-        - manifests/credsmanager/
-    namespace: edgefarm-network
+        - manifests/anck-credentials/
+    namespace: anck

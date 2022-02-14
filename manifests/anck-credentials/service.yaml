@@ -1,11 +1,11 @@
 apiVersion: v1
 kind: Service
 metadata:
-  namespace: edgefarm-network
-  name: credsmanager
+  namespace: anck
+  name: anck-credentials
 spec:
   selector:
-    app: credsmanager
+    app: anck-credentials
   ports:
     - protocol: TCP
       port: 6000

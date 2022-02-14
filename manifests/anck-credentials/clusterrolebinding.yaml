@@ -1,14 +1,14 @@
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
-  name: credsmanager
+  name: anck-credentials
   labels:
-    k8s-app: credsmanager
+    k8s-app: anck-credentials
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
-  name: credsmanager
+  name: anck-credentials
 subjects:
   - kind: ServiceAccount
-    name: credsmanager
-    namespace: edgefarm-network
+    name: anck-credentials
+    namespace: anck
