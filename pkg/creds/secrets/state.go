@@ -26,22 +26,22 @@ import (
 
 // State stores the current state of the credentials (all used accounts)
 type NatsAccountMapping struct {
-	Account         string `json:"account"`
-	ApplicationName string `json:"application"`
+	NatsAccount string `json:"natsaccount"`
+	Network     string `json:"network"`
 }
 
 // State stores information about the current state of the credentials
-type UserMapping struct {
-	ApplicationName string             `json:"application"`
-	Credentials     []*api.Credentials `json:"credentials"`
+type ParticipantMapping struct {
+	Network     string             `json:"network"`
+	Credentials []*api.Credentials `json:"credentials"`
 }
 
 // State stores the current state of the anck-credentials
 type State struct {
 	// UsedAccounts map the used ngs nats account to the account name specified by the user
 	UsedAccounts []NatsAccountMapping `json:"usedaccounts"`
-	// UserMappings map the user specified account name to the credentials
-	UserMappings []UserMapping `json:"usermapping"`
+	// ParticipantMappings map the participant specified network name to the credentials
+	ParticipantMappings []ParticipantMapping `json:"participantmappings"`
 }
 
 // ReadState reads the state of the credentials and returns struct State
