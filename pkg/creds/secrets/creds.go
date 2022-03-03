@@ -87,10 +87,10 @@ func (c *CredsSecrets) getUnusedNatsAccounts(state *State) ([]string, error) {
 	// Remove account from unusedNatsAccounts if already present in state.UsedAccounts
 	for _, secret := range secrets.Items {
 		for _, s := range state.UsedAccounts {
-			if s.Network == secret.Name {
-				unusedNatsAccounts, err = removeAccount(unusedNatsAccounts, s.Network)
+			if s.NatsAccount == secret.Name {
+				unusedNatsAccounts, err = removeAccount(unusedNatsAccounts, s.NatsAccount)
 				if err != nil {
-					return nil, fmt.Errorf("getUnusedNatsAccounts: cannot remove network %s from unusedNatsAccounts, err: %v", s.Network, err)
+					return nil, fmt.Errorf("getUnusedNatsAccounts: cannot remove network %s from unusedNatsAccounts, err: %v", s.NatsAccount, err)
 				}
 			}
 		}
@@ -99,7 +99,7 @@ func (c *CredsSecrets) getUnusedNatsAccounts(state *State) ([]string, error) {
 }
 
 // AllocateNatsAccount allocates a new nats account if possible
-func (c *CredsSecrets) AllocateNatsAccount(applicationName string) (string, error) {
+func (c *CredsSecrets) AllocateNatsAccount(network string) (string, error) {
 	state, err := ReadState(c.client)
 	if err != nil {
 		return "", fmt.Errorf("AllocateNatsAccount: cannot read state, err: %v", err)
@@ -111,16 +111,16 @@ func (c *CredsSecrets) AllocateNatsAccount(applicationName string) (string, erro
 
 	// Use the first unused account
 	if len(unusedNatsAccounts) > 0 {
-		network := unusedNatsAccounts[0]
+		natsAccount := unusedNatsAccounts[0]
 		state.UsedAccounts = append(state.UsedAccounts, NatsAccountMapping{
-			Network:         network,
-			ParticipantName: applicationName,
+			Network:     network,
+			NatsAccount: natsAccount,
 		})
 		err := UpdateState(c.client, state)
 		if err != nil {
 			return "", err
 		}
-		return network, nil
+		return natsAccount, nil
 	} else {
 		return "", fmt.Errorf("AllocateNatsAccount: no nats account available")
 	}
@@ -136,9 +136,29 @@ func removeAccount(slice []string, s string) ([]string, error) {
 	return nil, fmt.Errorf("removeAccount: account %s not found", s)
 }
 
+func hasDuplicates(s []string) bool {
+	visited := make(map[string]bool)
+	for i := 0; i < len(s); i++ {
+		if visited[s[i]] {
+			return true
+		} else {
+			visited[s[i]] = true
+		}
+	}
+	return false
+}
+
 // DesiredState constructs the desired state of credentials for a given application name
 func (c *CredsSecrets) DesiredState(network string, participants []string) (*api.DesiredStateResponse, error) {
-	// func (c *CredsSecrets) DesiredState(accountName string, usernames []string) (*api.DesiredStateResponse, error) {
+	if hasDuplicates(participants) {
+		return nil, fmt.Errorf("DesiredState: participants list cannot contains duplicates")
+	}
+
+	networkParticipantsList := []string{}
+	for _, p := range participants {
+		networkParticipantsList = append(networkParticipantsList, network+"."+p)
+	}
+
 	var natsAccount = ""
 
 	// Check current state if application name is already used
@@ -147,8 +167,8 @@ func (c *CredsSecrets) DesiredState(network string, participants []string) (*api
 		return nil, fmt.Errorf("DesiredState: cannot read state, err: %v", err)
 	}
 	for _, s := range state.UsedAccounts {
-		if s.ParticipantName == network {
-			natsAccount = s.Network
+		if s.Network == network {
+			natsAccount = s.NatsAccount
 		}
 	}
 
@@ -178,17 +198,17 @@ func (c *CredsSecrets) DesiredState(network string, participants []string) (*api
 	networkParticipantIndex := -1
 	configuredParticipants := func() []string {
 		var participants []string
-		for i, user := range c.State.ParticipantMappings {
-			if user.ParticipantName == network {
+		for i, participant := range c.State.ParticipantMappings {
+			if participant.Network == network {
 				networkParticipantIndex = i
-				for _, creds := range user.Credentials {
+				for _, creds := range participant.Credentials {
 					participants = append(participants, creds.NetworkParticipant)
 				}
 			}
 		}
 		return participants
 	}()
-	unconfigured, deleted := unconfiguredParticipants(configuredParticipants, participants)
+	unconfigured, deleted := unconfiguredParticipants(configuredParticipants, networkParticipantsList)
 	fmt.Println("Unconfigured participants: ", unconfigured)
 	fmt.Println("Deleted participants: ", deleted)
 	participantCreds := []*api.Credentials{}
@@ -197,15 +217,15 @@ func (c *CredsSecrets) DesiredState(network string, participants []string) (*api
 	}
 
 	for _, participant := range unconfigured {
-		fmt.Printf("Generating secret for participant %s\n", participant)
+		fmt.Printf("Generating secret for %s\n", participant)
 		participantCreds = append(participantCreds, &api.Credentials{
 			Creds:              string(secrets.Items[0].Data[fixedUsername]),
-			NetworkParticipant: fmt.Sprintf("%s.%s", network, participant),
+			NetworkParticipant: participant,
 		})
 	}
 
 	for _, participant := range deleted {
-		fmt.Printf("Deleting secret for user %s\n", participant)
+		fmt.Printf("Deleting secret for %s\n", participant)
 		for i, creds := range participantCreds {
 			if creds.NetworkParticipant == participant {
 				participantCreds = append(participantCreds[:i], participantCreds[i+1:]...)
@@ -215,14 +235,14 @@ func (c *CredsSecrets) DesiredState(network string, participants []string) (*api
 
 	userMappingIndex := -1
 	for i, mapping := range c.State.ParticipantMappings {
-		if mapping.ParticipantName == network {
+		if mapping.Network == network {
 			userMappingIndex = i
 		}
 	}
 	if userMappingIndex == -1 {
 		c.State.ParticipantMappings = append(c.State.ParticipantMappings, ParticipantMapping{
-			ParticipantName: network,
-			Credentials:     participantCreds,
+			Network:     network,
+			Credentials: participantCreds,
 		})
 	} else {
 		c.State.ParticipantMappings[userMappingIndex].Credentials = participantCreds
@@ -237,9 +257,7 @@ func (c *CredsSecrets) DesiredState(network string, participants []string) (*api
 		Creds: participantCreds,
 		DeletedParticipants: func() []string {
 			deletedNetworkParticipants := []string{}
-			for _, participant := range deleted {
-				deletedNetworkParticipants = append(deletedNetworkParticipants, fmt.Sprintf("%s.%s", network, participant))
-			}
+			deletedNetworkParticipants = append(deletedNetworkParticipants, deleted...)
 			return deletedNetworkParticipants
 		}(),
 	}
@@ -291,6 +309,14 @@ func (c *CredsSecrets) DeleteNetwork(network string) error {
 			break
 		}
 	}
+
+	for i, mapping := range state.ParticipantMappings {
+		if mapping.Network == network {
+			state.ParticipantMappings = append(state.ParticipantMappings[:i], state.ParticipantMappings[i+1:]...)
+			break
+		}
+	}
+
 	if !networkUsed {
 		return fmt.Errorf("'%s' not used", network)
 	}

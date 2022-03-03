@@ -84,7 +84,7 @@ func (s *Config) DesiredState(ctx context.Context, req *api.DesiredStateRequest)
 	fmt.Printf("Obtaining secrets for network name '%s'\n", network)
 	secrets, err := s.CredsIf.DesiredState(network, req.Participants)
 	if err != nil {
-		fmt.Printf("Error: %v", err)
+		fmt.Printf("Error: %v\n", err)
 		return nil, err
 	}
 	return secrets, nil

@@ -41,3 +41,12 @@ func TestUnconfiguredParticipantsAddAndDeleteParticipant(t *testing.T) {
 	assert.Equal([]string{"participantc"}, deleted)
 	assert.Equal([]string{"participantd"}, unconfigured)
 }
+
+func TestHasDuplicates(t *testing.T) {
+	assert := assert.New(t)
+	s := []string{"duplicate", "asdf", "kjl", "duplicate", "34s"}
+	assert.True(hasDuplicates(s))
+
+	s = []string{"duplicate", "asdf", "kjl", "34s"}
+	assert.False(hasDuplicates(s))
+}
