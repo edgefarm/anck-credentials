@@ -19,8 +19,8 @@ import (
 
 // If is an interface to handle the different sources of credentials.
 type CredsIf interface {
-	DesiredState(account string, usernames []string) (*api.DesiredStateResponse, error)
-	DeleteAccount(account string) error
+	DesiredState(network string, participants []string) (*api.DesiredStateResponse, error)
+	DeleteNetwork(network string) error
 }
 
 // Creds contains everything a Credentials uses

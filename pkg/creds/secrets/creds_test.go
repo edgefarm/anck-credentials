@@ -8,36 +8,36 @@ import (
 
 func TestUnconfiguredChangeNothing(t *testing.T) {
 	assert := assert.New(t)
-	currentUserList := []string{"usera", "userb"}
-	newUserList := []string{"usera", "userb"}
-	unconfigured, deleted := unconfiguredUsers(currentUserList, newUserList)
+	currentParticipantList := []string{"participanta", "participantb"}
+	newParticipantList := []string{"participanta", "participantb"}
+	unconfigured, deleted := unconfiguredParticipants(currentParticipantList, newParticipantList)
 	assert.Empty(unconfigured)
 	assert.Empty(deleted)
 }
 
-func TestUnconfiguredUsersNewUser(t *testing.T) {
+func TestUnconfiguredParticipantsNewParticipant(t *testing.T) {
 	assert := assert.New(t)
-	currentUserList := []string{"usera", "userb"}
-	newUserList := []string{"usera", "userb", "userc"}
-	unconfigured, deleted := unconfiguredUsers(currentUserList, newUserList)
-	assert.Equal([]string{"userc"}, unconfigured)
+	currentParticipantList := []string{"participanta", "participantb"}
+	newParticipantList := []string{"participanta", "participantb", "participantc"}
+	unconfigured, deleted := unconfiguredParticipants(currentParticipantList, newParticipantList)
+	assert.Equal([]string{"participantc"}, unconfigured)
 	assert.Empty(deleted)
 }
 
-func TestUnconfiguredUsersDeleteUser(t *testing.T) {
+func TestUnconfiguredParticipantsDeleteParticipant(t *testing.T) {
 	assert := assert.New(t)
-	currentUserList := []string{"usera", "userb", "userc"}
-	newUserList := []string{"usera", "userb"}
-	unconfigured, deleted := unconfiguredUsers(currentUserList, newUserList)
-	assert.Equal([]string{"userc"}, deleted)
+	currentParticipantList := []string{"participanta", "participantb", "participantc"}
+	newParticipantList := []string{"participanta", "participantb"}
+	unconfigured, deleted := unconfiguredParticipants(currentParticipantList, newParticipantList)
+	assert.Equal([]string{"participantc"}, deleted)
 	assert.Empty(unconfigured)
 }
 
-func TestUnconfiguredUsersAddAndDeleteUser(t *testing.T) {
+func TestUnconfiguredParticipantsAddAndDeleteParticipant(t *testing.T) {
 	assert := assert.New(t)
-	currentUserList := []string{"usera", "userb", "userc"}
-	newUserList := []string{"usera", "userb", "userd"}
-	unconfigured, deleted := unconfiguredUsers(currentUserList, newUserList)
-	assert.Equal([]string{"userc"}, deleted)
-	assert.Equal([]string{"userd"}, unconfigured)
+	currentParticipantList := []string{"participanta", "participantb", "participantc"}
+	newParticipantList := []string{"participanta", "participantb", "participantd"}
+	unconfigured, deleted := unconfiguredParticipants(currentParticipantList, newParticipantList)
+	assert.Equal([]string{"participantc"}, deleted)
+	assert.Equal([]string{"participantd"}, unconfigured)
 }
