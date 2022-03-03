@@ -65,37 +65,37 @@ func (c *Config) StartConfigServer() error {
 
 // DesiredState rpc constructs the desired state of the credentials
 func (s *Config) DesiredState(ctx context.Context, req *api.DesiredStateRequest) (*api.DesiredStateResponse, error) {
-	accountName := req.AccountName
+	network := req.Network
 	// check if account has spaces in it
-	if strings.Contains(accountName, " ") {
-		return nil, status.Errorf(codes.InvalidArgument, "AccountName '%s' contains spaces", accountName)
+	if strings.Contains(network, " ") {
+		return nil, status.Errorf(codes.InvalidArgument, "Network '%s' contains spaces", network)
 	}
 
-	if accountName == "" {
-		return nil, status.Error(codes.InvalidArgument, "AccountName cannot be empty")
+	if network == "" {
+		return nil, status.Error(codes.InvalidArgument, "Network cannot be empty")
 	}
 
-	for _, username := range req.Username {
-		if username == "" {
-			return nil, status.Error(codes.InvalidArgument, "Username cannot be empty")
+	for _, participant := range req.Participants {
+		if participant == "" {
+			return nil, status.Error(codes.InvalidArgument, "Participant cannot be empty")
 		}
 	}
 
-	fmt.Printf("Obtaining secrets for account name '%s'\n", accountName)
-	secrets, err := s.CredsIf.DesiredState(accountName, req.Username)
+	fmt.Printf("Obtaining secrets for network name '%s'\n", network)
+	secrets, err := s.CredsIf.DesiredState(network, req.Participants)
 	if err != nil {
-		fmt.Printf("Error: %v", err)
+		fmt.Printf("Error: %v\n", err)
 		return nil, err
 	}
 	return secrets, nil
 }
 
 // DeleteAccount rpc deletes the account from the credentials.
-func (s *Config) DeleteAccount(ctx context.Context, req *api.DeleteAccountRequest) (*api.DeleteAccountResponse, error) {
-	fmt.Printf("Deleting account '%s'\n", req.AccountName)
-	err := s.CredsIf.DeleteAccount(req.AccountName)
+func (s *Config) DeleteNetwork(ctx context.Context, req *api.DeleteNetworkRequest) (*api.DeleteNetworkResponse, error) {
+	fmt.Printf("Deleting network '%s'\n", req.Network)
+	err := s.CredsIf.DeleteNetwork(req.Network)
 	if err != nil {
-		return nil, status.Errorf(codes.Internal, "Cannot delete account %s", req.AccountName)
+		return nil, status.Errorf(codes.Internal, "Cannot delete network %s", req.Network)
 	}
-	return &api.DeleteAccountResponse{}, nil
+	return &api.DeleteNetworkResponse{}, nil
 }
