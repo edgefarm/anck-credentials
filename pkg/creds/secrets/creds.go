@@ -26,10 +26,11 @@ import (
 )
 
 const (
-	namespace      = "anck"
-	stateSecret    = "anck-credentials-state"
-	fixedUsername  = "user"
-	passwortLength = 30
+	namespace        = "anck"
+	stateSecret      = "anck-credentials-state"
+	fixedUsername    = "user"
+	accountPublicKey = "account-public-key"
+	passwortLength   = 30
 )
 
 // CredsSecrets implements CredsIf using Kubernetes secrets
@@ -220,6 +221,7 @@ func (c *CredsSecrets) DesiredState(network string, participants []string) (*api
 		fmt.Printf("Generating secret for %s\n", participant)
 		participantCreds = append(participantCreds, &api.Credentials{
 			Creds:              string(secrets.Items[0].Data[fixedUsername]),
+			AccoutPublicKey:    string(secrets.Items[0].Data[accountPublicKey]),
 			NetworkParticipant: participant,
 		})
 	}

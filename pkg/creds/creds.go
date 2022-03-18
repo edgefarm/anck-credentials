@@ -21,6 +21,7 @@ import (
 type CredsIf interface {
 	DesiredState(network string, participants []string) (*api.DesiredStateResponse, error)
 	DeleteNetwork(network string) error
+	SysAccount() (*api.SysAccountResponse, error)
 }
 
 // Creds contains everything a Credentials uses

@@ -99,3 +99,13 @@ func (s *Config) DeleteNetwork(ctx context.Context, req *api.DeleteNetworkReques
 	}
 	return &api.DeleteNetworkResponse{}, nil
 }
+
+func (s *Config) SysAccount(ctx context.Context, req *api.SysAccountRequest) (*api.SysAccountResponse, error) {
+	fmt.Printf("Obtaining sys account request\n")
+	res, err := s.CredsIf.SysAccount()
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, "Cannot obtain sys account: %s", err)
+	}
+	return res, nil
+
+}
