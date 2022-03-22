@@ -254,8 +254,11 @@ func (c *CredsSecrets) DesiredState(network string, participants []string) (*api
 
 	fmt.Printf("Mapped nats account '%s' to network '%s'\n", natsAccount, network)
 	res := &api.DesiredStateResponse{
-		AccoutPublicKey: string(secrets.Items[0].Data[accountPublicKey]),
-		Creds:           participantCreds,
+		Network: &api.Network{
+			Name:            network,
+			AccoutPublicKey: string(secrets.Items[0].Data[accountPublicKey]),
+		},
+		Creds: participantCreds,
 		DeletedParticipants: func() []string {
 			deletedNetworkParticipants := []string{}
 			deletedNetworkParticipants = append(deletedNetworkParticipants, deleted...)

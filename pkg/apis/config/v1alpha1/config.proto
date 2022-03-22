@@ -35,10 +35,15 @@ message Credentials {
   string creds = 2;
 }
 
+message Network {
+  string name = 1;
+  string accoutPublicKey = 2;
+}
+
 message DesiredStateResponse {
   repeated Credentials creds = 1;
   repeated string deletedParticipants = 2;
-  string accoutPublicKey = 3;
+  Network network = 3;
 }
 
 message DeleteNetworkRequest { string network = 1; }
