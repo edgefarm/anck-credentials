@@ -30,7 +30,6 @@ const (
 	stateSecret      = "anck-credentials-state"
 	fixedUsername    = "user"
 	accountPublicKey = "account-public-key"
-	passwortLength   = 30
 )
 
 // CredsSecrets implements CredsIf using Kubernetes secrets
@@ -221,7 +220,6 @@ func (c *CredsSecrets) DesiredState(network string, participants []string) (*api
 		fmt.Printf("Generating secret for %s\n", participant)
 		participantCreds = append(participantCreds, &api.Credentials{
 			Creds:              string(secrets.Items[0].Data[fixedUsername]),
-			AccoutPublicKey:    string(secrets.Items[0].Data[accountPublicKey]),
 			NetworkParticipant: participant,
 		})
 	}
@@ -256,7 +254,8 @@ func (c *CredsSecrets) DesiredState(network string, participants []string) (*api
 
 	fmt.Printf("Mapped nats account '%s' to network '%s'\n", natsAccount, network)
 	res := &api.DesiredStateResponse{
-		Creds: participantCreds,
+		AccoutPublicKey: string(secrets.Items[0].Data[accountPublicKey]),
+		Creds:           participantCreds,
 		DeletedParticipants: func() []string {
 			deletedNetworkParticipants := []string{}
 			deletedNetworkParticipants = append(deletedNetworkParticipants, deleted...)

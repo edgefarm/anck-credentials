@@ -33,12 +33,12 @@ message DesiredStateRequest {
 message Credentials {
   string networkParticipant = 1;
   string creds = 2;
-  string accoutPublicKey = 3;
 }
 
 message DesiredStateResponse {
   repeated Credentials creds = 1;
   repeated string deletedParticipants = 2;
+  string accoutPublicKey = 3;
 }
 
 message DeleteNetworkRequest { string network = 1; }
