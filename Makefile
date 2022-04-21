@@ -23,7 +23,12 @@ test: ## run go tests
 clean: ## cleans all
 	rm -rf ${BIN_DIR}/anck-credentials
 
-.PHONY: all tidiy build proto tes clean help
+docker-build-push: ## build and push docker image, use PREFIX="<prefix>" to set the prefix, use VERSION="<version>" to set the version
+	docker build -f build/Dockerfile -t ci4rail/${PREFIX}anck-credentials:${VERSION} -t ci4rail/${PREFIX}anck-credentials:latest .
+	docker push ci4rail/${PREFIX}anck-credentials:${VERSION}
+	docker push ci4rail/${PREFIX}anck-credentials:latest
+
+.PHONY: all tidiy build proto tes clean help docker-build-push
 
 help: ## show help message
 	@awk 'BEGIN {FS = ":.*##"; printf "\nUsage:\n  make [target]\033[36m\033[0m\n"} /^[$$()% 0-9a-zA-Z_-]+:.*?##/ { printf "  \033[36m%-15s\033[0m\t %s\n", $$1, $$2 } /^##@/ { printf "\n\033[1m%s\033[0m\n", substr($$0, 5) } ' $(MAKEFILE_LIST)

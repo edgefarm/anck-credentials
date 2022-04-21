@@ -34,8 +34,13 @@ var rootCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		fmt.Println("anck-credentials called")
 		creds := secrets.NewCredsSecrets()
+		_, err := creds.GetNatsServerInfos()
+		if err != nil {
+			fmt.Println(err)
+			os.Exit(1)
+		}
 		config := config.NewConfig(grpcPort, creds)
-		err := config.StartConfigServer()
+		err = config.StartConfigServer()
 		if err != nil {
 			fmt.Println(err)
 			os.Exit(1)
