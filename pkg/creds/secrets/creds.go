@@ -23,6 +23,7 @@ import (
 	"k8s.io/client-go/rest"
 
 	api "github.com/edgefarm/anck-credentials/pkg/apis/config/v1alpha1"
+	common "github.com/edgefarm/anck/pkg/common"
 )
 
 const (
@@ -73,7 +74,7 @@ func NewCredsSecrets() *CredsSecrets {
 
 func (c *CredsSecrets) getUnusedNatsAccounts(state *State) ([]string, error) {
 	unusedNatsAccounts := []string{}
-	secrets, err := c.client.CoreV1().Secrets(namespace).List(context.Background(), metav1.ListOptions{
+	secrets, err := c.client.CoreV1().Secrets(common.AnckNamespace).List(context.Background(), metav1.ListOptions{
 		LabelSelector: "natsfunction=users",
 	})
 	if err != nil {
@@ -184,7 +185,7 @@ func (c *CredsSecrets) DesiredState(network string, participants []string) (*api
 		}
 	}
 
-	secrets, err := c.client.CoreV1().Secrets(namespace).List(context.Background(), metav1.ListOptions{
+	secrets, err := c.client.CoreV1().Secrets(common.AnckNamespace).List(context.Background(), metav1.ListOptions{
 		LabelSelector: fmt.Sprintf("natsaccount=%s,natsfunction=users", natsAccount),
 	})
 

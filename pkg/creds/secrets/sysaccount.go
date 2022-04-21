@@ -18,12 +18,13 @@ import (
 	"fmt"
 
 	api "github.com/edgefarm/anck-credentials/pkg/apis/config/v1alpha1"
+	common "github.com/edgefarm/anck/pkg/common"
 
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
-func (c *CredsSecrets) SysAccount() (*api.SysAccountResponse, error) {
-	secrets, err := c.client.CoreV1().Secrets(namespace).List(context.Background(), metav1.ListOptions{
+func (c *CredsSecrets) GetSysAccount() (*api.SysAccount, error) {
+	secrets, err := c.client.CoreV1().Secrets(common.AnckNamespace).List(context.Background(), metav1.ListOptions{
 		LabelSelector: "natsfunction=sys-account",
 	})
 	if err != nil {
@@ -34,7 +35,7 @@ func (c *CredsSecrets) SysAccount() (*api.SysAccountResponse, error) {
 		return nil, fmt.Errorf("no sys-account secret found")
 	}
 
-	return &api.SysAccountResponse{
+	return &api.SysAccount{
 		OperatorJWT:  string(secrets.Items[0].Data["operator-jwt"]),
 		SysPublicKey: string(secrets.Items[0].Data["sys-public-key"]),
 		SysCreds:     string(secrets.Items[0].Data["sys-creds"]),
