@@ -258,6 +258,7 @@ func (c *CredsSecrets) DesiredState(network string, participants []string) (*api
 		Network: &api.Network{
 			Name:            network,
 			AccoutPublicKey: string(secrets.Items[0].Data[accountPublicKey]),
+			AccountName:     natsAccount,
 		},
 		Creds: participantCreds,
 		DeletedParticipants: func() []string {
@@ -308,7 +309,7 @@ func (c *CredsSecrets) DeleteNetwork(network string) error {
 	networkUsed := false
 	for i, usedAccount := range state.UsedAccounts {
 		if usedAccount.Network == network {
-			fmt.Printf("Freeing network '%s'\n", usedAccount.Network)
+			fmt.Printf("Freeing account '%s' with network '%s'\n", usedAccount.NatsAccount, usedAccount.Network)
 			state.UsedAccounts = append(state.UsedAccounts[:i], state.UsedAccounts[i+1:]...)
 			networkUsed = true
 			break
