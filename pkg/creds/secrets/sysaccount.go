@@ -35,6 +35,19 @@ func (c *CredsSecrets) GetSysAccount() (*api.SysAccount, error) {
 		return nil, fmt.Errorf("no sys-account secret found")
 	}
 
+	if _, ok := secrets.Items[0].Data["operator-jwt"]; !ok {
+		return nil, fmt.Errorf("secret %s does not contain key %s", secrets.Items[0].Name, "operator-jwt")
+	}
+	if _, ok := secrets.Items[0].Data["sys-public-key"]; !ok {
+		return nil, fmt.Errorf("secret %s does not contain key %s", secrets.Items[0].Name, "sys-public-key")
+	}
+	if _, ok := secrets.Items[0].Data["sys-creds"]; !ok {
+		return nil, fmt.Errorf("secret %s does not contain key %s", secrets.Items[0].Name, "sys-creds")
+	}
+	if _, ok := secrets.Items[0].Data["sys-jwt"]; !ok {
+		return nil, fmt.Errorf("secret %s does not contain key %s", secrets.Items[0].Name, "sys-jwt")
+	}
+
 	return &api.SysAccount{
 		OperatorJWT:  string(secrets.Items[0].Data["operator-jwt"]),
 		SysPublicKey: string(secrets.Items[0].Data["sys-public-key"]),
