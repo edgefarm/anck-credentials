@@ -1,0 +1,37 @@
+version: v1beta11
+
+vars:
+  # devspace dev
+  - name: IMAGE
+    value: ci4rail/anck-credentials
+
+dev:
+  ports:
+    - imageSelector: ${IMAGE}
+      forward:
+        - port: 6000 # Forward the port from the Pod to localhost:6000
+        - port: 23450 # Forward the port from the Pod to localhost:23450
+          remotePort: 2345
+  sync:
+    - imageSelector: ${IMAGE}
+      localSubPath: ../
+      excludePaths:
+        - .git/
+  terminal:
+    imageSelector: ${IMAGE}
+    command:
+      - bash
+  replacePods:
+    - imageSelector: ${IMAGE}
+      replaceImage: loftsh/go:latest
+      patches:
+        - op: replace
+          path: spec.containers[0].command
+          value:
+            - sleep
+        - op: replace
+          path: spec.containers[0].args
+          value:
+            - "999999999"
+        - op: remove
+          path: spec.containers[0].securityContext
