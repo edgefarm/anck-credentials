@@ -3,6 +3,6 @@ WORKDIR /code
 COPY . .
 RUN make
 
-FROM alpine:3.14
+FROM alpine:3.16
 COPY --from=builder /code/bin/anck-credentials /anck-credentials
 ENTRYPOINT ["/anck-credentials"]
