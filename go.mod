@@ -5,7 +5,7 @@ go 1.18
 require (
 	github.com/edgefarm/anck v0.4.0
 	github.com/hsson/once v1.0.1
-	github.com/spf13/cobra v1.2.1
+	github.com/spf13/cobra v1.5.0
 	github.com/stretchr/testify v1.7.0
 	google.golang.org/grpc v1.42.0
 	google.golang.org/protobuf v1.28.0
