@@ -7,8 +7,12 @@ github.com/cespare/xxhash/v2
 # github.com/davecgh/go-spew v1.1.1
 ## explicit
 github.com/davecgh/go-spew/spew
-# github.com/edgefarm/anck v0.4.0
-## explicit; go 1.17
+# github.com/edgefarm/anck v0.5.2
+## explicit; go 1.18
+github.com/edgefarm/anck/apis/network/v1alpha1
+github.com/edgefarm/anck/pkg/client/networkclientset
+github.com/edgefarm/anck/pkg/client/networkclientset/scheme
+github.com/edgefarm/anck/pkg/client/networkclientset/typed/network/v1alpha1
 github.com/edgefarm/anck/pkg/common
 github.com/edgefarm/anck/pkg/resources
 # github.com/evanphx/json-patch v4.12.0+incompatible
@@ -69,6 +73,9 @@ github.com/json-iterator/go
 # github.com/matttproud/golang_protobuf_extensions v1.0.2-0.20181231171920-c182affec369
 ## explicit; go 1.9
 github.com/matttproud/golang_protobuf_extensions/pbutil
+# github.com/merkur0/go-slices v0.0.0-20191008224404-0191b04c1ee8
+## explicit
+github.com/merkur0/go-slices
 # github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd
 ## explicit
 github.com/modern-go/concurrent
@@ -106,6 +113,9 @@ github.com/spf13/cobra
 # github.com/spf13/pflag v1.0.5
 ## explicit; go 1.12
 github.com/spf13/pflag
+# github.com/ssoroka/slice v0.0.0-20220402005549-78f0cea3df8b
+## explicit; go 1.18
+github.com/ssoroka/slice
 # github.com/stretchr/testify v1.7.0
 ## explicit; go 1.13
 github.com/stretchr/testify/assert
